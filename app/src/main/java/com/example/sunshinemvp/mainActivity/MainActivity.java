@@ -29,7 +29,9 @@ import android.widget.Toast;
 
 import com.example.sunshinemvp.R;
 import com.example.sunshinemvp.adapters.WeatherForecastAdapter;
+import com.example.sunshinemvp.data.WeatherDbHelper;
 import com.example.sunshinemvp.forecastActivity.ForecastActivity;
+import com.example.sunshinemvp.models.City;
 import com.example.sunshinemvp.models.ForecastResult;
 import com.example.sunshinemvp.models.WeatherResult;
 import com.squareup.picasso.Picasso;
@@ -260,7 +262,14 @@ public class MainActivity extends AppCompatActivity implements MainContract.Main
         String sunrise = weatherResult.getCity().getmSunset();
         String sunset = weatherResult.getCity().getmSunrise();
         String pressure = weatherResult.getMain().getPressure().toString();
-        String cityName = weatherResult.getCityName() + ", " + weatherResult.getCity().getCountry();
+        String cityName;
+        if(weatherResult.getCityName() != ""){
+            WeatherDbHelper db = new WeatherDbHelper(getApplicationContext());
+            City city = db.getCity(weatherResult.getCityId().toString());
+            cityName = city.getName() + ", " + city.getCountry();
+        } else {
+            cityName = weatherResult.getCityName() + ", " + weatherResult.getCity().getCountry();
+        }
 
         weatherTypeTextView.setText(weatherResult.getWeatherList().get(0).getMain());
         minMaxTempTextView.setText(minMaxTemp);
@@ -277,9 +286,9 @@ public class MainActivity extends AppCompatActivity implements MainContract.Main
 
     @Override
     public void onResponseFailure(Throwable throwable) {
-        Toast.makeText(MainActivity.this,
+       /* Toast.makeText(MainActivity.this,
                 "Something went wrong...Error message: " + throwable.getMessage(),
-                Toast.LENGTH_LONG).show();
+                Toast.LENGTH_LONG).show(); */
     }
 
     @Override

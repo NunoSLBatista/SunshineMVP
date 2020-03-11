@@ -1,5 +1,7 @@
 package com.example.sunshinemvp.mainActivity;
 
+import android.util.Log;
+
 import com.example.sunshinemvp.data.WeatherDbHelper;
 import com.example.sunshinemvp.models.ForecastResult;
 import com.example.sunshinemvp.models.WeatherDay;
@@ -92,8 +94,35 @@ public class MainPresenterImpl implements MainContract.presenter, MainContract.G
     }
 
     @Override
+    public void onFinishedLocalDataBase(ArrayList<WeatherDay> weatherDays, WeatherResult weatherResult) {
+        if(mainView != null && weatherDays != null && weatherResult != null) { ;
+            this.tomorrowWeatherArrayList = new ArrayList<WeatherDay>();
+            this.currentWeatherArrayList = new ArrayList<WeatherDay>();
+            weatherResult.setCityId(weatherDays.get(0).getCityId());
+            this.weatherDayArrayList = weatherDays;
+            mainView.setWeatherData(weatherResult);
+            organizeArrays(weatherDays.get(0).getCityId().toString());
+            mainView.setDataToRecyclerView(new ForecastResult());
+            mainView.hideProgress();
+        } else if (weatherResult == null || weatherDays == null){
+            mainView.cityNotFound();
+            mainView.hideProgress();
+        }
+
+    }
+
+    @Override
     public void onFailure(Throwable t) {
         if(mainView != null){
+            mainView.onResponseFailure(t);
+            mainView.hideProgress();
+        }
+    }
+
+    @Override
+    public void onFailureNoCity(Throwable t) {
+        if(mainView != null){
+            mainView.cityNotFound();
             mainView.onResponseFailure(t);
             mainView.hideProgress();
         }

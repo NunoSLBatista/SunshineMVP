@@ -1,6 +1,7 @@
 package com.example.sunshinemvp.mainActivity;
 
 import com.example.sunshinemvp.models.ForecastResult;
+import com.example.sunshinemvp.models.Weather;
 import com.example.sunshinemvp.models.WeatherDay;
 import com.example.sunshinemvp.models.WeatherResult;
 
@@ -47,7 +48,9 @@ public class MainContract {
         interface OnFinishedListener {
             void onFinishedWeather(WeatherResult weatherResultArrayList);
             void onFinishedForecast(ForecastResult weatherResultArrayList);
+            void onFinishedLocalDataBase(ArrayList<WeatherDay> weatherDays, WeatherResult weatherResult);
             void onFailure(Throwable t);
+            void onFailureNoCity(Throwable t);
         }
 
         void getWeatherResult(String city, OnFinishedListener onFinishedListener);

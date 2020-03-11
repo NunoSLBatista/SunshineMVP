@@ -372,6 +372,7 @@ public class WeatherDbHelper extends SQLiteOpenHelper {
                 newWeather.getMain().setFeelsLike(cursor.getDouble(cursor.getColumnIndex(ForecastEntry.COLUMN_FEELS_LIKE_TEMP)));
                 newWeather.getMain().setPressure(cursor.getDouble(cursor.getColumnIndex(ForecastEntry.COLUMN_PRESSURE)));
                 newWeather.setDate(cursor.getString(cursor.getColumnIndex(ForecastEntry.COLUMN_DATE)));
+                newWeather.setCityId(cursor.getInt(cursor.getColumnIndex(ForecastEntry.COUMN_CITY_ID)));
 
                 ArrayList<Weather> weather = new ArrayList<>();
                 weather.add(this.getWeatherType(cursor.getString(cursor.getColumnIndex(ForecastEntry.COLUMN_WEATHER_TYPE))));

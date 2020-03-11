@@ -1,11 +1,20 @@
 package com.example.sunshinemvp.mainActivity;
 
+import android.content.Context;
+import android.util.Log;
+
 import androidx.annotation.NonNull;
 
+import com.example.sunshinemvp.data.WeatherDbHelper;
+import com.example.sunshinemvp.models.City;
 import com.example.sunshinemvp.models.ForecastResult;
+import com.example.sunshinemvp.models.WeatherDay;
 import com.example.sunshinemvp.models.WeatherResult;
 import com.example.sunshinemvp.network.GetDataService;
+import com.example.sunshinemvp.network.MyApplication;
 import com.example.sunshinemvp.network.RetrofitClientInstance;
+
+import java.util.ArrayList;
 
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -35,7 +44,20 @@ public class GetWeatherIntractorImpl implements MainContract.GetWeatherIntractor
 
             @Override
             public void onFailure(@NonNull Call<WeatherResult> call, @NonNull Throwable t) {
-                onFinishedListener.onFailure(t);
+                WeatherDbHelper db = new WeatherDbHelper(MyApplication.getAppContext());
+                City cityObject = db.getCityId(city);
+                if(cityObject.getId() != null) {
+                    ArrayList<WeatherDay> weatherDays = db.getForecastCity(cityObject.getId().toString());
+                    ArrayList<WeatherResult> weatherResult = db.getWeatherCity(cityObject.getId().toString());
+                    if (weatherDays != null) {
+                        onFinishedListener.onFinishedLocalDataBase(weatherDays, weatherResult.get(weatherResult.size() - 1));
+                    } else {
+                        onFinishedListener.onFailureNoCity(t);
+                    }
+                } else {
+                    onFinishedListener.onFailureNoCity(t);
+                }
+
             }
         });
 
@@ -60,6 +82,8 @@ public class GetWeatherIntractorImpl implements MainContract.GetWeatherIntractor
 
             @Override
             public void onFailure(@NonNull Call<WeatherResult> call, @NonNull Throwable t) {
+
+
                 onFinishedListener.onFailure(t);
             }
         });
@@ -103,7 +127,7 @@ public class GetWeatherIntractorImpl implements MainContract.GetWeatherIntractor
         call.enqueue(new Callback<ForecastResult>() {
             @Override
             public void onResponse(@NonNull Call<ForecastResult> call, @NonNull Response<ForecastResult> response) {
-                if(response.raw().code() == 200) {
+                if(response.raw().isSuccessful()) {
                     onFinishedListener.onFinishedForecast(response.body());
                 }else {
                     onFinishedListener.onFinishedWeather(null);
